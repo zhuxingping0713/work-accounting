@@ -50,7 +50,28 @@ router.post('/api/auth/change-name', apiAuth, async (req, res) => {
   const { displayName } = req.body;
   if (!displayName || !displayName.trim()) return res.json({ ok: false, msg: '昵称不能为空' });
   await User.findByIdAndUpdate(req.userId, { displayName: displayName.trim() });
+  // 重新签发 token 让导航栏立即显示新昵称
+  const token = jwt.sign({ userId: req.userId, username: req.user.username, displayName: displayName.trim(), role: req.user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
   res.json({ ok: true });
+});
+
+// POST /api/auth/change-username
+router.post('/api/auth/change-username', apiAuth, async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !username.trim()) return res.json({ ok: false, msg: '用户名不能为空' });
+  const user = await User.findById(req.userId);
+  if (!user) return res.json({ ok: false, msg: '用户不存在' });
+  const valid = await user.comparePassword(password);
+  if (!valid) return res.json({ ok: false, msg: '密码错误' });
+  const exists = await User.findOne({ username: username.trim() });
+  if (exists) return res.json({ ok: false, msg: '用户名已被占用' });
+  user.username = username.trim();
+  await user.save();
+  // 重新签发 token
+  const token = jwt.sign({ userId: user._id, username: user.username, displayName: user.displayName, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+  res.json({ ok: true, username: user.username });
 });
 
 // POST /api/auth/change-pwd

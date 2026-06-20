@@ -1,11 +1,24 @@
 <div class="page">
   <h2>⚙️ 设置</h2>
+
+  <div class="settings-section">
+    <h3>📝 修改用户名</h3>
+    <form id="userForm" onsubmit="changeUser(event)">
+      <label>新用户名:</label>
+      <input name="newUsername" placeholder="输入新用户名" required minlength="2">
+      <label>输入密码确认:</label>
+      <input name="password" type="password" required>
+      <button type="submit">修改用户名</button>
+    </form>
+    <div id="userMsg"></div>
+  </div>
+
   <div class="settings-section">
     <h3>👤 修改昵称</h3>
     <form id="nameForm" onsubmit="changeName(event)">
-      <label>当前昵称:</label>
+      <label>显示昵称:</label>
       <input name="displayName" value="<%= user.displayName || user.username %>" required>
-      <button type="submit">保存</button>
+      <button type="submit">保存昵称</button>
     </form>
     <div id="nameMsg"></div>
   </div>
@@ -15,14 +28,14 @@
     <form id="changePwdForm" onsubmit="changePwd(event)">
       <label>原密码:</label><input name="oldPwd" type="password" required>
       <label>新密码:</label><input name="newPwd" type="password" required minlength="3">
-      <button type="submit">修改</button>
+      <button type="submit">修改密码</button>
     </form>
     <div id="pwdMsg"></div>
   </div>
 
   <div class="settings-section">
     <h3>📋 当前账户</h3>
-    <p>用户名: <strong><%= user.username %></strong> | 角色: <strong><%= user.role==='admin'?'管理员':'普通用户' %></strong></p>
+    <p>用户名: <strong id="curUser"><%= user.username %></strong> | 角色: <strong><%= user.role==='admin'?'管理员':'普通用户' %></strong></p>
   </div>
 
   <div class="settings-section">
@@ -40,19 +53,25 @@
 <script>
 const basePath = '<%= basePath %>';
 
+async function changeUser(e){
+  e.preventDefault();
+  const r = await fetch(basePath+'/api/auth/change-username',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:e.target.newUsername.value,password:e.target.password.value})});
+  const data = await r.json();
+  if(data.ok){ document.getElementById('curUser').textContent = data.username||e.target.newUsername.value; document.getElementById('nameForm').displayName.value = e.target.newUsername.value; }
+  document.getElementById('userMsg').textContent = data.ok?'✅ 修改成功':'❌ '+data.msg;
+}
+
 async function changeName(e){
   e.preventDefault();
-  const displayName = e.target.displayName.value;
-  const r = await fetch(basePath+'/api/auth/change-name',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({displayName})});
+  const r = await fetch(basePath+'/api/auth/change-name',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({displayName:e.target.displayName.value})});
   const data = await r.json();
-  document.getElementById('nameMsg').textContent = data.ok?'✅ 修改成功，刷新后生效':'❌ '+data.msg;
+  document.getElementById('nameMsg').textContent = data.ok?'✅ 修改成功':'❌ '+data.msg;
+  if(data.ok) setTimeout(()=>location.reload(),500);
 }
 
 async function changePwd(e){
   e.preventDefault();
-  const oldPwd = e.target.oldPwd.value;
-  const newPwd = e.target.newPwd.value;
-  const r = await fetch(basePath+'/api/auth/change-pwd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({oldPwd,newPwd})});
+  const r = await fetch(basePath+'/api/auth/change-pwd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({oldPwd:e.target.oldPwd.value,newPwd:e.target.newPwd.value})});
   const data = await r.json();
   document.getElementById('pwdMsg').textContent = data.ok?'✅ 修改成功':'❌ '+data.msg;
 }
