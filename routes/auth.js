@@ -31,8 +31,22 @@ router.get('/logout', (req, res) => {
   res.redirect(basePath + '/login');
 });
 
+// Auth check middleware for API routes
+const apiAuth = (req, res, next) => {
+  const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ ok: false, msg: '未登录' });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decoded.userId;
+    req.user = decoded;
+    next();
+  } catch (e) {
+    return res.status(401).json({ ok: false, msg: '登录已过期' });
+  }
+};
+
 // POST /api/auth/change-name
-router.post('/api/auth/change-name', async (req, res) => {
+router.post('/api/auth/change-name', apiAuth, async (req, res) => {
   const { displayName } = req.body;
   if (!displayName || !displayName.trim()) return res.json({ ok: false, msg: '昵称不能为空' });
   await User.findByIdAndUpdate(req.userId, { displayName: displayName.trim() });
@@ -40,7 +54,7 @@ router.post('/api/auth/change-name', async (req, res) => {
 });
 
 // POST /api/auth/change-pwd
-router.post('/api/auth/change-pwd', async (req, res) => {
+router.post('/api/auth/change-pwd', apiAuth, async (req, res) => {
   const { oldPwd, newPwd } = req.body;
   const user = await User.findById(req.userId);
   if (!user) return res.status(404).json({ ok: false, msg: '用户不存在' });
@@ -52,7 +66,7 @@ router.post('/api/auth/change-pwd', async (req, res) => {
 });
 
 // POST /api/auth/register (admin only)
-router.post('/api/auth/register', async (req, res) => {
+router.post('/api/auth/register', apiAuth, async (req, res) => {
   const user = await User.findById(req.userId);
   if (!user || user.role !== 'admin') return res.status(403).json({ ok: false, msg: '无权限' });
   const { username, password, displayName } = req.body;
