@@ -5,7 +5,7 @@
   <div id="catForm" class="modal" style="display:none">
     <div class="modal-content">
       <h3>添加分类</h3>
-      <form method="POST" action="/categories">
+      <form method="POST" action="<%= basePath %>/categories">
         <label>名称:</label><input name="name" required>
         <label>类型:</label>
         <select name="type"><option value="income">收入</option><option value="expense">支出</option><option value="utility">水电</option></select>
@@ -45,11 +45,12 @@
 </div>
 
 <script>
-async function delCat(id){if(confirm('确定删除？')){await fetch('/categories/'+id,{method:'DELETE'});location.reload();}}
+const basePath = '<%= basePath %>';
+async function delCat(id){if(confirm('确定删除？')){await fetch(basePath+'/categories/'+id,{method:'DELETE'});location.reload();}}
 async function editCat(id,name,type){
   const nn = prompt('名称:',name);
   if(!nn)return;
-  await fetch('/categories/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nn,type})});
+  await fetch(basePath+'/categories/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nn,type})});
   location.reload();
 }
 </script>

@@ -2,7 +2,7 @@
   <h2>💧 水电账单 — <%= currentMonth %></h2>
 
   <div class="toolbar">
-    <form class="filter-form" method="GET" action="/bills">
+    <form class="filter-form" method="GET" action="<%= basePath %>/bills">
       <select name="month" onchange="this.form.submit()">
         <% months.forEach(m => { %><option value="<%= m %>" <%= m===currentMonth?'selected':'' %>><%= m %></option><% }) %>
         <% if (months.length===0) { %><option><%= currentMonth %></option><% } %>
@@ -33,11 +33,10 @@
     </tbody>
   </table>
 
-  <!-- Edit form -->
   <div id="billForm" class="modal" style="display:none">
     <div class="modal-content">
       <h3 id="billFormTitle">编辑水电</h3>
-      <form method="POST" action="/bills">
+      <form method="POST" action="<%= basePath %>/bills">
         <input type="hidden" name="type" id="billType">
         <input type="hidden" name="month" id="billMonth">
         <label>金额:</label>
@@ -56,14 +55,15 @@
 </div>
 
 <script>
+const basePath = '<%= basePath %>';
 function editBill(type,month,amount,paidDate,remark){
   document.getElementById('billType').value = type;
   document.getElementById('billMonth').value = month;
   document.getElementById('billAmount').value = amount||'';
-  document.getElementById('billPaidDate').value = paidDate||'<%= new Date().toISOString().substring(0,10) %>';
+  document.getElementById('billPaidDate').value = paidDate||'';
   document.getElementById('billRemark').value = remark||'';
   document.getElementById('billFormTitle').textContent = '编辑 '+{water:'水费',electric:'电费',gas:'燃气',net:'网费',rent:'房租',other:'其他'}[type];
   document.getElementById('billForm').style.display='block';
 }
-async function delBill(id){if(confirm('确定删除？')){await fetch('/bills/'+id,{method:'DELETE'});location.reload();}}
+async function delBill(id){if(confirm('确定删除？')){await fetch(basePath+'/bills/'+id,{method:'DELETE'});location.reload();}}
 </script>

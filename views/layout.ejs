@@ -4,27 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>打工记账</title>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="<%= basePath %>/style.css">
 </head>
 <body>
   <nav>
     <div class="nav-left">
-      <a href="/" class="logo">💼 打工记账</a>
-      <a href="/jobs">📋 账单</a>
-      <a href="/salary">💰 工资</a>
-      <a href="/bills">💧 水电</a>
-      <a href="/employers">👤 雇主</a>
-      <a href="/categories">🏷️ 分类</a>
+      <a href="<%= basePath %>/" class="logo">💼 打工记账</a>
+      <a href="<%= basePath %>/jobs">📋 账单</a>
+      <a href="<%= basePath %>/salary">💰 工资</a>
+      <a href="<%= basePath %>/bills">💧 水电</a>
+      <a href="<%= basePath %>/employers">👤 雇主</a>
+      <a href="<%= basePath %>/categories">🏷️ 分类</a>
     </div>
     <div class="nav-right">
       <span class="user-info">👋 <%= user.displayName || user.username %></span>
-      <a href="/settings">⚙️</a>
-      <a href="/logout" class="logout-btn">退出</a>
+      <a href="<%= basePath %>/settings">⚙️</a>
+      <a href="<%= basePath %>/logout" class="logout-btn">退出</a>
     </div>
   </nav>
   <main>
     <%- body %>
   </main>
-  <script src="/script.js"></script>
+  <script src="<%= basePath %>/script.js"></script>
 </body>
 </html>

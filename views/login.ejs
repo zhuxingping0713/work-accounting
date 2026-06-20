@@ -19,11 +19,12 @@
   </style>
 </head>
 <body>
+  <% const basePath = basePath || ''; %>
   <div class="login-box">
     <h1>💼 打工记账</h1>
     <p class="sub">个人财务管理系统</p>
-    <% if (error) { %><p class="error"><%= error %></p><% } %>
-    <form method="POST" action="/login">
+    <% if (typeof error !== 'undefined' && error) { %><p class="error"><%= error %></p><% } %>
+    <form method="POST" action="<%= basePath %>/login">
       <label>用户名</label>
       <input name="username" placeholder="请输入用户名" required autofocus>
       <label>密码</label>

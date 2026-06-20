@@ -2,7 +2,7 @@
   <h2>📋 账单</h2>
 
   <div class="toolbar">
-    <form class="filter-form" method="GET" action="/jobs">
+    <form class="filter-form" method="GET" action="<%= basePath %>/jobs">
       <select name="type"><option value="all" <%= filter.type==='all'?'selected':'' %>>全部</option><option value="income" <%= filter.type==='income'?'selected':'' %>>收入</option><option value="expense" <%= filter.type==='expense'?'selected':'' %>>支出</option></select>
       <input name="month" type="month" value="<%= filter.month %>" placeholder="月份">
       <input name="keyword" value="<%= filter.keyword %>" placeholder="搜索备注...">
@@ -12,11 +12,10 @@
     <button class="btn-primary" onclick="document.getElementById('addForm').style.display='block'">➕ 记一笔</button>
   </div>
 
-  <!-- Add form -->
   <div id="addForm" class="modal" style="display:none">
     <div class="modal-content">
       <h3>记一笔</h3>
-      <form method="POST" action="/jobs">
+      <form method="POST" action="<%= basePath %>/jobs">
         <label>类型:</label>
         <select name="type" id="jobType" onchange="toggleEmployer()">
           <option value="income">收入</option><option value="expense">支出</option>
@@ -60,13 +59,14 @@
   <% if (totalPages > 1) { %>
   <div class="pagination">
     <% for (let i=1;i<=totalPages;i++) { %>
-    <a href="?type=<%= filter.type %>&month=<%= filter.month %>&keyword=<%= filter.keyword %>&page=<%= i %>" class="<%= i===page?'active':'' %>"><%= i %></a>
+    <a href="<%= basePath %>/jobs?type=<%= filter.type %>&month=<%= filter.month %>&keyword=<%= filter.keyword %>&page=<%= i %>" class="<%= i===page?'active':'' %>"><%= i %></a>
     <% } %>
   </div>
   <% } %>
 </div>
 
 <script>
+const basePath = '<%= basePath %>';
 const cats = <%- JSON.stringify(categories) %>;
 const emps = <%- JSON.stringify(employers) %>;
 
@@ -81,11 +81,11 @@ function toggleEmployer(){
 }
 toggleEmployer();
 
-async function delJob(id){if(confirm('确定删除？')){await fetch('/jobs/'+id,{method:'DELETE'});location.reload();}}
+async function delJob(id){if(confirm('确定删除？')){await fetch(basePath+'/jobs/'+id,{method:'DELETE'});location.reload();}}
 async function editJob(id,type,date,catId,empId,amount,remark){
   const newAmount = prompt('新金额:',amount);
   if(newAmount===null)return;
-  await fetch('/jobs/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,date,categoryId:catId||null,employerId:empId||null,amount:+newAmount,remark})});
+  await fetch(basePath+'/jobs/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,date,categoryId:catId||null,employerId:empId||null,amount:+newAmount,remark})});
   location.reload();
 }
 </script>

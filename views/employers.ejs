@@ -5,7 +5,7 @@
   <div id="empForm" class="modal" style="display:none">
     <div class="modal-content">
       <h3>添加雇主</h3>
-      <form method="POST" action="/employers">
+      <form method="POST" action="<%= basePath %>/employers">
         <label>名称:</label><input name="name" required>
         <label>联系人:</label><input name="contact">
         <label>电话:</label><input name="phone">
@@ -39,11 +39,12 @@
 </div>
 
 <script>
-async function delEmp(id){if(confirm('确定删除？')){await fetch('/employers/'+id,{method:'DELETE'});location.reload();}}
+const basePath = '<%= basePath %>';
+async function delEmp(id){if(confirm('确定删除？')){await fetch(basePath+'/employers/'+id,{method:'DELETE'});location.reload();}}
 async function editEmp(id,name,contact,phone,remark){
   const nn = prompt('名称:',name);
   if(!nn)return;
-  await fetch('/employers/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nn,contact,phone,remark})});
+  await fetch(basePath+'/employers/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nn,contact,phone,remark})});
   location.reload();
 }
 </script>

@@ -1,5 +1,6 @@
 const express = require('express');
 const Category = require('../models/Category');
+const basePath = process.env.BASE_PATH || '';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
@@ -7,12 +8,12 @@ router.get('/', async (req, res) => {
   const income = cats.filter(c=>c.type==='income');
   const expense = cats.filter(c=>c.type==='expense');
   const utility = cats.filter(c=>c.type==='utility');
-  res.render('categories', { income, expense, utility, user: req.user });
+  res.render('categories', { income, expense, utility, basePath, user: req.user });
 });
 
 router.post('/', async (req, res) => {
   await Category.create({ userId: req.userId, ...req.body });
-  res.redirect('/categories');
+  res.redirect(basePath + '/categories');
 });
 
 router.put('/:id', async (req, res) => {

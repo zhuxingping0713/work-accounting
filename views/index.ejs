@@ -19,25 +19,23 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
+const basePath = '<%= basePath %>';
 (async function(){
-  const r = await fetch('/api/stats/overview?month=<%= currentMonth %>');
+  const r = await fetch(basePath + '/api/stats/overview?month=<%= currentMonth %>');
   const data = await r.json();
 
-  // Income pie
   new Chart(document.getElementById('incomeChart'), {
     type:'doughnut',
     data:{labels:data.incomeByCat.map(c=>c.name),datasets:[{data:data.incomeByCat.map(c=>c.total)}]},
     options:{plugins:{legend:{position:'bottom'}}}
   });
 
-  // Expense pie
   new Chart(document.getElementById('expenseChart'), {
     type:'doughnut',
     data:{labels:data.expenseByCat.map(c=>c.name),datasets:[{data:data.expenseByCat.map(c=>c.total),backgroundColor:['#e74c3c','#f39c12','#9b59b6','#3498db','#1abc9c','#e67e22','#95a5a6']}]},
     options:{plugins:{legend:{position:'bottom'}}}
   });
 
-  // Trend line
   new Chart(document.getElementById('trendChart'), {
     type:'line',
     data:{

@@ -2,10 +2,10 @@ const express = require('express');
 const Job = require('../models/Job');
 const Category = require('../models/Category');
 const Employer = require('../models/Employer');
+const basePath = process.env.BASE_PATH || '';
 
 const router = express.Router();
 
-// GET list
 router.get('/', async (req, res) => {
   const { month, type, keyword, page = 1 } = req.query;
   const filter = { userId: req.userId };
@@ -26,7 +26,6 @@ router.get('/', async (req, res) => {
   const categories = await Category.find({ userId: req.userId, type: { $in: ['income','expense'] } }).lean();
   const employers = await Employer.find({ userId: req.userId }).lean();
 
-  // monthly stats
   const now = new Date();
   const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
   const monthJobs = await Job.find({ userId: req.userId, date: { $regex: '^' + ym } });
@@ -35,17 +34,15 @@ router.get('/', async (req, res) => {
 
   res.render('jobs', { jobs, categories, employers, total, page: +page, totalPages: Math.ceil(total/limit),
     filter: { type: type||'all', month: month||'', keyword: keyword||'' },
-    monthIncome, monthExpense, user: req.user });
+    monthIncome, monthExpense, basePath, user: req.user });
 });
 
-// POST create
 router.post('/', async (req, res) => {
   const { type, date, categoryId, employerId, amount, remark } = req.body;
   await Job.create({ userId: req.userId, type, date, categoryId: categoryId||null, employerId: employerId||null, amount: +amount, remark });
-  res.redirect('/jobs');
+  res.redirect(basePath + '/jobs');
 });
 
-// PUT update
 router.put('/:id', async (req, res) => {
   const job = await Job.findOne({ _id: req.params.id, userId: req.userId });
   if (!job) return res.json({ ok: false, msg: '未找到' });
@@ -54,7 +51,6 @@ router.put('/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
-// DELETE
 router.delete('/:id', async (req, res) => {
   await Job.findOneAndDelete({ _id: req.params.id, userId: req.userId });
   res.json({ ok: true });

@@ -1,33 +1,34 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const basePath = process.env.BASE_PATH || '';
 
 const router = express.Router();
 
 // GET /login
 router.get('/login', (req, res) => {
   if (req.cookies?.token) {
-    try { jwt.verify(req.cookies.token, process.env.JWT_SECRET); return res.redirect('/'); } catch {}
+    try { jwt.verify(req.cookies.token, process.env.JWT_SECRET); return res.redirect(basePath + '/'); } catch {}
   }
-  res.render('login', { error: null });
+  res.render('login', { error: null, basePath });
 });
 
 // POST /login
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
-  if (!user) return res.render('login', { error: '用户名不存在' });
+  if (!user) return res.render('login', { error: '用户名不存在', basePath });
   const valid = await user.comparePassword(password);
-  if (!valid) return res.render('login', { error: '密码错误' });
+  if (!valid) return res.render('login', { error: '密码错误', basePath });
   const token = jwt.sign({ userId: user._id, username: user.username, displayName: user.displayName, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
   res.cookie('token', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
-  res.redirect('/');
+  res.redirect(basePath + '/');
 });
 
 // GET /logout
 router.get('/logout', (req, res) => {
   res.clearCookie('token');
-  res.redirect('/login');
+  res.redirect(basePath + '/login');
 });
 
 // POST /api/auth/change-pwd

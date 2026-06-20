@@ -2,14 +2,13 @@
   <h2>💰 工资管理 — <%= currentMonth %></h2>
 
   <div class="toolbar">
-    <form class="filter-form" method="GET" action="/salary">
+    <form class="filter-form" method="GET" action="<%= basePath %>/salary">
       <select name="month" onchange="this.form.submit()">
         <% months.forEach(m => { %><option value="<%= m %>" <%= m===currentMonth?'selected':'' %>><%= m %></option><% }) %>
       </select>
     </form>
   </div>
 
-  <!-- Wage summary card -->
   <div class="salary-summary">
     <div class="s-item">📅 出勤 <strong><%= workDays %></strong> 天</div>
     <div class="s-item">💰 应发 <strong>¥<%= totalSalary.toFixed(2) %></strong></div>
@@ -22,11 +21,10 @@
     <button class="btn-warn" onclick="document.getElementById('advanceForm').style.display='block'">💸 预支</button>
   </div>
 
-  <!-- Checkin form -->
   <div id="checkinForm" class="modal" style="display:none">
     <div class="modal-content">
       <h3>打卡出勤</h3>
-      <form method="POST" action="/salary/checkin">
+      <form method="POST" action="<%= basePath %>/salary/checkin">
         <label>日期:</label>
         <input name="date" type="date" value="<%= new Date().toISOString().substring(0,10) %>" required>
         <label>工时(天):</label>
@@ -45,11 +43,10 @@
     </div>
   </div>
 
-  <!-- Advance form -->
   <div id="advanceForm" class="modal" style="display:none">
     <div class="modal-content">
       <h3>预支记录</h3>
-      <form method="POST" action="/salary/advance">
+      <form method="POST" action="<%= basePath %>/salary/advance">
         <label>日期:</label>
         <input name="date" type="date" value="<%= new Date().toISOString().substring(0,10) %>" required>
         <label>金额:</label>
@@ -99,6 +96,7 @@
 </div>
 
 <script>
-async function delSalary(id){if(confirm('确定删除？')){await fetch('/salary/'+id,{method:'DELETE'});location.reload();}}
-async function delAdvance(id){if(confirm('确定删除？')){await fetch('/salary/advance/'+id,{method:'DELETE'});location.reload();}}
+const basePath = '<%= basePath %>';
+async function delSalary(id){if(confirm('确定删除？')){await fetch(basePath+'/salary/'+id,{method:'DELETE'});location.reload();}}
+async function delAdvance(id){if(confirm('确定删除？')){await fetch(basePath+'/salary/advance/'+id,{method:'DELETE'});location.reload();}}
 </script>

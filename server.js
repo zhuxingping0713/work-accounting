@@ -8,6 +8,7 @@ const User = require('./models/User');
 const Category = require('./models/Category');
 
 const app = express();
+app.locals.basePath = process.env.BASE_PATH || '';
 
 // Middleware
 app.use(express.json());
@@ -29,7 +30,7 @@ app.use('/api/stats', auth, require('./routes/stats'));
 
 // Settings page
 app.get('/settings', auth, (req, res) => {
-  res.render('settings', { user: req.user });
+  res.render('settings', { basePath: process.env.BASE_PATH || '', user: req.user });
 });
 
 // Home - Dashboard
@@ -55,6 +56,7 @@ app.get('/', auth, async (req, res) => {
   const balance = monthIncome + netSalary - monthExpense - billTotal;
 
   res.render('index', {
+    basePath: process.env.BASE_PATH || '',
     user: req.user,
     currentMonth: ym,
     monthIncome, monthExpense, billTotal,

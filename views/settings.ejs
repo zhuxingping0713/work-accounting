@@ -28,11 +28,12 @@
 </div>
 
 <script>
+const basePath = '<%= basePath %>';
 async function changePwd(e){
   e.preventDefault();
   const oldPwd = e.target.oldPwd.value;
   const newPwd = e.target.newPwd.value;
-  const r = await fetch('/api/auth/change-pwd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({oldPwd,newPwd})});
+  const r = await fetch(basePath+'/api/auth/change-pwd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({oldPwd,newPwd})});
   const data = await r.json();
   document.getElementById('pwdMsg').textContent = data.ok?'✅ 修改成功':'❌ '+data.msg;
 }
