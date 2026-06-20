@@ -31,6 +31,14 @@ router.get('/logout', (req, res) => {
   res.redirect(basePath + '/login');
 });
 
+// POST /api/auth/change-name
+router.post('/api/auth/change-name', async (req, res) => {
+  const { displayName } = req.body;
+  if (!displayName || !displayName.trim()) return res.json({ ok: false, msg: '昵称不能为空' });
+  await User.findByIdAndUpdate(req.userId, { displayName: displayName.trim() });
+  res.json({ ok: true });
+});
+
 // POST /api/auth/change-pwd
 router.post('/api/auth/change-pwd', async (req, res) => {
   const { oldPwd, newPwd } = req.body;

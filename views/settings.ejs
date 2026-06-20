@@ -1,6 +1,16 @@
 <div class="page">
   <h2>⚙️ 设置</h2>
   <div class="settings-section">
+    <h3>👤 修改昵称</h3>
+    <form id="nameForm" onsubmit="changeName(event)">
+      <label>当前昵称:</label>
+      <input name="displayName" value="<%= user.displayName || user.username %>" required>
+      <button type="submit">保存</button>
+    </form>
+    <div id="nameMsg"></div>
+  </div>
+
+  <div class="settings-section">
     <h3>🔐 修改密码</h3>
     <form id="changePwdForm" onsubmit="changePwd(event)">
       <label>原密码:</label><input name="oldPwd" type="password" required>
@@ -11,7 +21,7 @@
   </div>
 
   <div class="settings-section">
-    <h3>👤 当前用户</h3>
+    <h3>📋 当前账户</h3>
     <p>用户名: <strong><%= user.username %></strong> | 角色: <strong><%= user.role==='admin'?'管理员':'普通用户' %></strong></p>
   </div>
 
@@ -29,6 +39,15 @@
 
 <script>
 const basePath = '<%= basePath %>';
+
+async function changeName(e){
+  e.preventDefault();
+  const displayName = e.target.displayName.value;
+  const r = await fetch(basePath+'/api/auth/change-name',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({displayName})});
+  const data = await r.json();
+  document.getElementById('nameMsg').textContent = data.ok?'✅ 修改成功，刷新后生效':'❌ '+data.msg;
+}
+
 async function changePwd(e){
   e.preventDefault();
   const oldPwd = e.target.oldPwd.value;
