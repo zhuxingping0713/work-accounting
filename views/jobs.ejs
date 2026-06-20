@@ -1,0 +1,91 @@
+<div class="page">
+  <h2>📋 账单</h2>
+
+  <div class="toolbar">
+    <form class="filter-form" method="GET" action="/jobs">
+      <select name="type"><option value="all" <%= filter.type==='all'?'selected':'' %>>全部</option><option value="income" <%= filter.type==='income'?'selected':'' %>>收入</option><option value="expense" <%= filter.type==='expense'?'selected':'' %>>支出</option></select>
+      <input name="month" type="month" value="<%= filter.month %>" placeholder="月份">
+      <input name="keyword" value="<%= filter.keyword %>" placeholder="搜索备注...">
+      <button type="submit">筛选</button>
+    </form>
+    <span class="month-summary">收入 ¥<%= monthIncome.toFixed(2) %> ｜ 支出 ¥<%= monthExpense.toFixed(2) %></span>
+    <button class="btn-primary" onclick="document.getElementById('addForm').style.display='block'">➕ 记一笔</button>
+  </div>
+
+  <!-- Add form -->
+  <div id="addForm" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>记一笔</h3>
+      <form method="POST" action="/jobs">
+        <label>类型:</label>
+        <select name="type" id="jobType" onchange="toggleEmployer()">
+          <option value="income">收入</option><option value="expense">支出</option>
+        </select>
+        <label>分类:</label>
+        <select name="categoryId" id="jobCat"></select>
+        <label id="empLabel">雇主:</label>
+        <select name="employerId" id="jobEmp"><option value="">-- 选雇主 --</option></select>
+        <label>金额:</label>
+        <input name="amount" type="number" step="0.01" required>
+        <label>日期:</label>
+        <input name="date" type="date" value="<%= new Date().toISOString().substring(0,10) %>">
+        <label>备注:</label>
+        <input name="remark">
+        <div class="form-actions">
+          <button type="submit">保存</button>
+          <button type="button" onclick="document.getElementById('addForm').style.display='none'">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>日期</th><th>类型</th><th>分类</th><th>雇主</th><th>金额</th><th>备注</th><th>操作</th></tr></thead>
+    <tbody>
+      <% jobs.forEach(j => { %>
+      <tr class="<%= j.type %>">
+        <td><%= j.date %></td>
+        <td><%= j.type==='income'?'收入':'支出' %></td>
+        <td><%= j.categoryId?.name||'-' %></td>
+        <td><%= j.employerId?.name||'-' %></td>
+        <td class="<%= j.type==='income'?'positive':'negative' %>"><%= j.type==='income'?'+':'-' %>¥<%= j.amount.toFixed(2) %></td>
+        <td><%= j.remark %></td>
+        <td><button class="btn-sm" onclick="editJob('<%= j._id %>','<%= j.type %>','<%= j.date %>','<%= j.categoryId?._id||'' %>','<%= j.employerId?._id||'' %>','<%= j.amount %>','<%= j.remark %>')">编辑</button>
+        <button class="btn-sm btn-danger" onclick="delJob('<%= j._id %>')">删除</button></td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <% if (totalPages > 1) { %>
+  <div class="pagination">
+    <% for (let i=1;i<=totalPages;i++) { %>
+    <a href="?type=<%= filter.type %>&month=<%= filter.month %>&keyword=<%= filter.keyword %>&page=<%= i %>" class="<%= i===page?'active':'' %>"><%= i %></a>
+    <% } %>
+  </div>
+  <% } %>
+</div>
+
+<script>
+const cats = <%- JSON.stringify(categories) %>;
+const emps = <%- JSON.stringify(employers) %>;
+
+function refreshCats(type){
+  document.getElementById('jobCat').innerHTML = cats.filter(c=>c.type===type).map(c=>`<option value="${c._id}">${c.name}</option>`).join('');
+}
+function toggleEmployer(){
+  const t = document.getElementById('jobType').value;
+  refreshCats(t);
+  document.getElementById('empLabel').style.display = t==='income'?'block':'none';
+  document.getElementById('jobEmp').style.display = t==='income'?'block':'none';
+}
+toggleEmployer();
+
+async function delJob(id){if(confirm('确定删除？')){await fetch('/jobs/'+id,{method:'DELETE'});location.reload();}}
+async function editJob(id,type,date,catId,empId,amount,remark){
+  const newAmount = prompt('新金额:',amount);
+  if(newAmount===null)return;
+  await fetch('/jobs/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({type,date,categoryId:catId||null,employerId:empId||null,amount:+newAmount,remark})});
+  location.reload();
+}
+</script>

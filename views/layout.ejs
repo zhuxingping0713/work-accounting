@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>打工记账</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <div class="nav-left">
+      <a href="/" class="logo">💼 打工记账</a>
+      <a href="/jobs">📋 账单</a>
+      <a href="/salary">💰 工资</a>
+      <a href="/bills">💧 水电</a>
+      <a href="/employers">👤 雇主</a>
+      <a href="/categories">🏷️ 分类</a>
+    </div>
+    <div class="nav-right">
+      <span class="user-info">👋 <%= user.displayName || user.username %></span>
+      <a href="/settings">⚙️</a>
+      <a href="/logout" class="logout-btn">退出</a>
+    </div>
+  </nav>
+  <main>
+    <%- body %>
+  </main>
+  <script src="/script.js"></script>
+</body>
+</html>

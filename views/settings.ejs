@@ -1,0 +1,39 @@
+<div class="page">
+  <h2>⚙️ 设置</h2>
+  <div class="settings-section">
+    <h3>🔐 修改密码</h3>
+    <form id="changePwdForm" onsubmit="changePwd(event)">
+      <label>原密码:</label><input name="oldPwd" type="password" required>
+      <label>新密码:</label><input name="newPwd" type="password" required minlength="3">
+      <button type="submit">修改</button>
+    </form>
+    <div id="pwdMsg"></div>
+  </div>
+
+  <div class="settings-section">
+    <h3>👤 当前用户</h3>
+    <p>用户名: <strong><%= user.username %></strong> | 角色: <strong><%= user.role==='admin'?'管理员':'普通用户' %></strong></p>
+  </div>
+
+  <div class="settings-section">
+    <h3>📊 使用说明</h3>
+    <ul>
+      <li><strong>账单</strong>：记录日常收入和支出</li>
+      <li><strong>工资</strong>：打卡出勤，日工资 ¥240/天，支持预支</li>
+      <li><strong>水电</strong>：按月记录水电气网房租</li>
+      <li><strong>雇主</strong>：管理打工平台和雇主信息</li>
+      <li><strong>分类</strong>：自定义收入和支出类别</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+async function changePwd(e){
+  e.preventDefault();
+  const oldPwd = e.target.oldPwd.value;
+  const newPwd = e.target.newPwd.value;
+  const r = await fetch('/api/auth/change-pwd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({oldPwd,newPwd})});
+  const data = await r.json();
+  document.getElementById('pwdMsg').textContent = data.ok?'✅ 修改成功':'❌ '+data.msg;
+}
+</script>

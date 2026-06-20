@@ -1,0 +1,69 @@
+<div class="page">
+  <h2>💧 水电账单 — <%= currentMonth %></h2>
+
+  <div class="toolbar">
+    <form class="filter-form" method="GET" action="/bills">
+      <select name="month" onchange="this.form.submit()">
+        <% months.forEach(m => { %><option value="<%= m %>" <%= m===currentMonth?'selected':'' %>><%= m %></option><% }) %>
+        <% if (months.length===0) { %><option><%= currentMonth %></option><% } %>
+      </select>
+    </form>
+    <span class="month-summary">本月合计：<strong>¥<%= total.toFixed(2) %></strong></span>
+  </div>
+
+  <table>
+    <thead><tr><th>类型</th><th>金额</th><th>缴费日期</th><th>备注</th><th>操作</th></tr></thead>
+    <tbody>
+      <% BILL_TYPES.forEach(t => { 
+        const b = currentBills.find(x=>x.type===t);
+      %>
+      <tr>
+        <td><strong><%= TYPE_LABELS[t] %></strong></td>
+        <td><%= b ? '¥'+b.amount.toFixed(2) : '-' %></td>
+        <td><%= b?.paidDate||'-' %></td>
+        <td><%= b?.remark||'-' %></td>
+        <td>
+          <button class="btn-sm" onclick="editBill('<%= t %>','<%= currentMonth %>',<%= b?b.amount:0 %>,'<%= b?.paidDate||'' %>','<%= b?.remark||'' %>')">
+            <%= b?'编辑':'新增' %>
+          </button>
+          <% if (b) { %><button class="btn-sm btn-danger" onclick="delBill('<%= b._id %>')">删除</button><% } %>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <!-- Edit form -->
+  <div id="billForm" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3 id="billFormTitle">编辑水电</h3>
+      <form method="POST" action="/bills">
+        <input type="hidden" name="type" id="billType">
+        <input type="hidden" name="month" id="billMonth">
+        <label>金额:</label>
+        <input name="amount" id="billAmount" type="number" step="0.01" required>
+        <label>缴费日期:</label>
+        <input name="paidDate" id="billPaidDate" type="date">
+        <label>备注:</label>
+        <input name="remark" id="billRemark">
+        <div class="form-actions">
+          <button type="submit">保存</button>
+          <button type="button" onclick="document.getElementById('billForm').style.display='none'">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function editBill(type,month,amount,paidDate,remark){
+  document.getElementById('billType').value = type;
+  document.getElementById('billMonth').value = month;
+  document.getElementById('billAmount').value = amount||'';
+  document.getElementById('billPaidDate').value = paidDate||'<%= new Date().toISOString().substring(0,10) %>';
+  document.getElementById('billRemark').value = remark||'';
+  document.getElementById('billFormTitle').textContent = '编辑 '+{water:'水费',electric:'电费',gas:'燃气',net:'网费',rent:'房租',other:'其他'}[type];
+  document.getElementById('billForm').style.display='block';
+}
+async function delBill(id){if(confirm('确定删除？')){await fetch('/bills/'+id,{method:'DELETE'});location.reload();}}
+</script>

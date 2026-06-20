@@ -1,0 +1,104 @@
+<div class="page">
+  <h2>💰 工资管理 — <%= currentMonth %></h2>
+
+  <div class="toolbar">
+    <form class="filter-form" method="GET" action="/salary">
+      <select name="month" onchange="this.form.submit()">
+        <% months.forEach(m => { %><option value="<%= m %>" <%= m===currentMonth?'selected':'' %>><%= m %></option><% }) %>
+      </select>
+    </form>
+  </div>
+
+  <!-- Wage summary card -->
+  <div class="salary-summary">
+    <div class="s-item">📅 出勤 <strong><%= workDays %></strong> 天</div>
+    <div class="s-item">💰 应发 <strong>¥<%= totalSalary.toFixed(2) %></strong></div>
+    <div class="s-item advance">💸 预支 <strong>¥<%= totalAdvance.toFixed(2) %></strong></div>
+    <div class="s-item net">✅ 实发 <strong>¥<%= netPay.toFixed(2) %></strong></div>
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn-primary" onclick="document.getElementById('checkinForm').style.display='block'">➕ 打卡出勤</button>
+    <button class="btn-warn" onclick="document.getElementById('advanceForm').style.display='block'">💸 预支</button>
+  </div>
+
+  <!-- Checkin form -->
+  <div id="checkinForm" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>打卡出勤</h3>
+      <form method="POST" action="/salary/checkin">
+        <label>日期:</label>
+        <input name="date" type="date" value="<%= new Date().toISOString().substring(0,10) %>" required>
+        <label>工时(天):</label>
+        <input name="hours" type="number" value="1" step="0.5" min="0.5">
+        <label>日工资:</label>
+        <input name="dailyWage" type="number" value="240">
+        <label>当天预支:</label>
+        <input name="advance" type="number" value="0">
+        <label>备注:</label>
+        <input name="remark">
+        <div class="form-actions">
+          <button type="submit">保存</button>
+          <button type="button" onclick="document.getElementById('checkinForm').style.display='none'">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Advance form -->
+  <div id="advanceForm" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>预支记录</h3>
+      <form method="POST" action="/salary/advance">
+        <label>日期:</label>
+        <input name="date" type="date" value="<%= new Date().toISOString().substring(0,10) %>" required>
+        <label>金额:</label>
+        <input name="amount" type="number" required>
+        <label>备注:</label>
+        <input name="remark">
+        <div class="form-actions">
+          <button type="submit">保存</button>
+          <button type="button" onclick="document.getElementById('advanceForm').style.display='none'">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <h3>📅 出勤记录</h3>
+  <table>
+    <thead><tr><th>日期</th><th>工时</th><th>日工资</th><th>当天预支</th><th>小计</th><th>备注</th><th>操作</th></tr></thead>
+    <tbody>
+      <% salaries.forEach(s => { %>
+      <tr>
+        <td><%= s.date %></td>
+        <td><%= s.hours %>天</td>
+        <td>¥<%= s.dailyWage %></td>
+        <td><%= s.advance>0?'¥'+s.advance:'-' %></td>
+        <td class="positive">¥<%= s.amount.toFixed(2) %></td>
+        <td><%= s.remark %></td>
+        <td><button class="btn-sm btn-danger" onclick="delSalary('<%= s._id %>')">删除</button></td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <h3>💸 预支记录</h3>
+  <table>
+    <thead><tr><th>日期</th><th>金额</th><th>备注</th><th>操作</th></tr></thead>
+    <tbody>
+      <% advances.forEach(a => { %>
+      <tr>
+        <td><%= a.date %></td>
+        <td class="negative">¥<%= a.amount.toFixed(2) %></td>
+        <td><%= a.remark %></td>
+        <td><button class="btn-sm btn-danger" onclick="delAdvance('<%= a._id %>')">删除</button></td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+async function delSalary(id){if(confirm('确定删除？')){await fetch('/salary/'+id,{method:'DELETE'});location.reload();}}
+async function delAdvance(id){if(confirm('确定删除？')){await fetch('/salary/advance/'+id,{method:'DELETE'});location.reload();}}
+</script>

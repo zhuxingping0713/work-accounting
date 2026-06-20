@@ -1,0 +1,53 @@
+<div class="dashboard">
+  <h2>📊 财务看板 — <%= currentMonth %></h2>
+
+  <div class="cards">
+    <div class="card income"><div class="card-label">本月收入</div><div class="card-val">¥<%= monthIncome.toFixed(2) %></div></div>
+    <div class="card expense"><div class="card-label">本月支出</div><div class="card-val">¥<%= monthExpense.toFixed(2) %></div></div>
+    <div class="card salary"><div class="card-label">本月工资</div><div class="card-val">¥<%= netSalary.toFixed(2) %><small> 出勤 <%= (salaryTotal/240).toFixed(0) %>天</small></div></div>
+    <div class="card utility"><div class="card-label">水电合计</div><div class="card-val">¥<%= billTotal.toFixed(2) %></div></div>
+    <div class="card balance"><div class="card-label">本月结余</div><div class="card-val">¥<%= balance.toFixed(2) %></div></div>
+  </div>
+
+  <div class="charts">
+    <div class="chart-box"><h3>收入来源</h3><canvas id="incomeChart"></canvas></div>
+    <div class="chart-box"><h3>支出分类</h3><canvas id="expenseChart"></canvas></div>
+  </div>
+
+  <div class="chart-box"><h3>近30天趋势</h3><canvas id="trendChart"></canvas></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+(async function(){
+  const r = await fetch('/api/stats/overview?month=<%= currentMonth %>');
+  const data = await r.json();
+
+  // Income pie
+  new Chart(document.getElementById('incomeChart'), {
+    type:'doughnut',
+    data:{labels:data.incomeByCat.map(c=>c.name),datasets:[{data:data.incomeByCat.map(c=>c.total)}]},
+    options:{plugins:{legend:{position:'bottom'}}}
+  });
+
+  // Expense pie
+  new Chart(document.getElementById('expenseChart'), {
+    type:'doughnut',
+    data:{labels:data.expenseByCat.map(c=>c.name),datasets:[{data:data.expenseByCat.map(c=>c.total),backgroundColor:['#e74c3c','#f39c12','#9b59b6','#3498db','#1abc9c','#e67e22','#95a5a6']}]},
+    options:{plugins:{legend:{position:'bottom'}}}
+  });
+
+  // Trend line
+  new Chart(document.getElementById('trendChart'), {
+    type:'line',
+    data:{
+      labels:data.trend.map(t=>t.date),
+      datasets:[
+        {label:'收入',data:data.trend.map(t=>t.income),borderColor:'#27ae60',backgroundColor:'#27ae6033',fill:true,tension:.3},
+        {label:'支出',data:data.trend.map(t=>t.expense),borderColor:'#e74c3c',backgroundColor:'#e74c3c33',fill:true,tension:.3}
+      ]
+    },
+    options:{responsive:true,plugins:{legend:{position:'bottom'}}}
+  });
+})();
+</script>

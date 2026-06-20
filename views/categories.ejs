@@ -1,0 +1,55 @@
+<div class="page">
+  <h2>🏷️ 分类管理</h2>
+  <button class="btn-primary" onclick="document.getElementById('catForm').style.display='block'">➕ 添加分类</button>
+
+  <div id="catForm" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>添加分类</h3>
+      <form method="POST" action="/categories">
+        <label>名称:</label><input name="name" required>
+        <label>类型:</label>
+        <select name="type"><option value="income">收入</option><option value="expense">支出</option><option value="utility">水电</option></select>
+        <div class="form-actions">
+          <button type="submit">保存</button>
+          <button type="button" onclick="document.getElementById('catForm').style.display='none'">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <h3>📈 收入分类</h3>
+  <table>
+    <thead><tr><th>名称</th><th>操作</th></tr></thead>
+    <tbody>
+      <% income.forEach(c => { %>
+      <tr><td><%= c.name %></td><td>
+        <button class="btn-sm" onclick="editCat('<%= c._id %>','<%= c.name %>','<%= c.type %>')">编辑</button>
+        <button class="btn-sm btn-danger" onclick="delCat('<%= c._id %>')">删除</button>
+      </td></tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <h3>📉 支出分类</h3>
+  <table>
+    <thead><tr><th>名称</th><th>操作</th></tr></thead>
+    <tbody>
+      <% expense.forEach(c => { %>
+      <tr><td><%= c.name %></td><td>
+        <button class="btn-sm" onclick="editCat('<%= c._id %>','<%= c.name %>','<%= c.type %>')">编辑</button>
+        <button class="btn-sm btn-danger" onclick="delCat('<%= c._id %>')">删除</button>
+      </td></tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+async function delCat(id){if(confirm('确定删除？')){await fetch('/categories/'+id,{method:'DELETE'});location.reload();}}
+async function editCat(id,name,type){
+  const nn = prompt('名称:',name);
+  if(!nn)return;
+  await fetch('/categories/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nn,type})});
+  location.reload();
+}
+</script>

@@ -1,0 +1,96 @@
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f6fa;color:#333;min-height:100vh}
+
+/* Nav */
+nav{background:#2c3e50;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:0 20px;height:50px}
+nav a{color:#ecf0f1;text-decoration:none;padding:0 12px;font-size:14px;line-height:50px;display:inline-block}
+nav a:hover{background:#34495e}
+nav .logo{font-weight:700;font-size:16px}
+nav .user-info{color:#bdc3c7;font-size:13px}
+nav .logout-btn{background:#c0392b;padding:0 14px;margin-left:4px;border-radius:0}
+nav .logout-btn:hover{background:#e74c3c}
+.nav-left,.nav-right{display:flex;align-items:center}
+
+/* Main */
+main{padding:20px;max-width:1200px;margin:0 auto}
+.page{background:#fff;border-radius:8px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+/* Dashboard Cards */
+.dashboard h2{margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px}
+.card{padding:16px;border-radius:8px;text-align:center;color:#fff}
+.card.income{background:#27ae60}
+.card.expense{background:#e74c3c}
+.card.salary{background:#8e44ad}
+.card.utility{background:#e67e22}
+.card.balance{background:#2980b9}
+.card-label{font-size:13px;opacity:.9;margin-bottom:4px}
+.card-val{font-size:24px;font-weight:700}
+.card small{font-size:13px;opacity:.8;display:block;font-weight:400}
+
+/* Charts */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-box{background:#fff;padding:16px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.chart-box h3{margin-bottom:12px;font-size:15px}
+@media(max-width:768px){.charts{grid-template-columns:1fr}}
+
+/* Toolbar */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.filter-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.filter-form select,.filter-form input{padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:14px}
+.month-summary{color:#666;font-size:14px;margin-left:auto}
+
+/* Buttons */
+.btn-primary{padding:8px 18px;background:#4a90d9;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600}
+.btn-primary:hover{background:#357abd}
+.btn-warn{padding:8px 18px;background:#e67e22;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600}
+.btn-sm{padding:4px 10px;background:#ecf0f1;border:1px solid #ccc;border-radius:4px;cursor:pointer;font-size:12px}
+.btn-sm:hover{background:#ddd}
+.btn-danger{background:#fde8e8;border-color:#e74c3c;color:#e74c3c}
+.btn-danger:hover{background:#f5c6cb}
+.action-buttons{display:flex;gap:10px;margin-bottom:20px}
+
+/* Table */
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #eee;font-size:14px}
+th{background:#f8f9fa;font-weight:600;color:#555}
+tr:hover{background:#fafbfc}
+.positive{color:#27ae60;font-weight:600}
+.negative{color:#e74c3c;font-weight:600}
+tr.income td{background:#f0fff4}
+tr.expense td{background:#fff5f5}
+
+/* Salary Summary */
+.salary-summary{display:flex;gap:24px;margin-bottom:20px;padding:16px;background:#f8f9fa;border-radius:8px;flex-wrap:wrap}
+.s-item{font-size:16px}
+.s-item strong{color:#2c3e50}
+.s-item.advance strong{color:#e67e22}
+.s-item.net strong{color:#27ae60;font-size:20px}
+
+/* Modal */
+.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:flex;justify-content:center;align-items:flex-start;padding-top:60px;z-index:1000}
+.modal-content{background:#fff;padding:24px;border-radius:10px;width:420px;max-width:90%;max-height:80vh;overflow-y:auto}
+.modal-content h3{margin-bottom:16px}
+.modal-content label{display:block;margin-bottom:4px;font-weight:600;font-size:13px;color:#555}
+.modal-content input,.modal-content select{width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:6px;margin-bottom:12px;font-size:14px}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+.form-actions button{padding:8px 18px;border:none;border-radius:6px;cursor:pointer;font-size:14px}
+.form-actions button[type=submit]{background:#4a90d9;color:#fff}
+.form-actions button[type=button]{background:#eee;color:#666}
+
+/* Settings */
+.settings-section{background:#f8f9fa;padding:16px;border-radius:8px;margin-bottom:16px}
+.settings-section h3{margin-bottom:8px}
+.settings-section label{display:block;margin-bottom:4px;font-weight:600;font-size:13px;color:#555}
+.settings-section input{padding:8px 10px;border:1px solid #ddd;border-radius:6px;margin-bottom:8px;font-size:14px;width:240px}
+.settings-section button{padding:8px 18px;background:#4a90d9;color:#fff;border:none;border-radius:6px;cursor:pointer}
+.settings-section button:hover{background:#357abd}
+.settings-section ul{margin-left:20px;line-height:2}
+.settings-section li{font-size:14px}
+#pwdMsg{margin-top:8px;font-weight:600}
+
+/* Pagination */
+.pagination{display:flex;gap:6px;margin-top:16px;justify-content:center}
+.pagination a{padding:6px 12px;border:1px solid #ddd;border-radius:4px;text-decoration:none;color:#333;font-size:13px}
+.pagination a.active{background:#4a90d9;color:#fff;border-color:#4a90d9}
+.pagination a:hover:not(.active){background:#eee}

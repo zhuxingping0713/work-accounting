@@ -1,0 +1,49 @@
+<div class="page">
+  <h2>👤 雇主管理</h2>
+  <button class="btn-primary" onclick="document.getElementById('empForm').style.display='block'">➕ 添加雇主</button>
+
+  <div id="empForm" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>添加雇主</h3>
+      <form method="POST" action="/employers">
+        <label>名称:</label><input name="name" required>
+        <label>联系人:</label><input name="contact">
+        <label>电话:</label><input name="phone">
+        <label>备注:</label><input name="remark">
+        <div class="form-actions">
+          <button type="submit">保存</button>
+          <button type="button" onclick="document.getElementById('empForm').style.display='none'">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>名称</th><th>联系人</th><th>电话</th><th>累计收入</th><th>最近打工</th><th>操作</th></tr></thead>
+    <tbody>
+      <% employers.forEach(e => { %>
+      <tr>
+        <td><strong><%= e.name %></strong></td>
+        <td><%= e.contact||'-' %></td>
+        <td><%= e.phone||'-' %></td>
+        <td class="positive">¥<%= (e.totalIncome||0).toFixed(2) %></td>
+        <td><%= e.lastJob||'-' %></td>
+        <td>
+          <button class="btn-sm" onclick="editEmp('<%= e._id %>','<%= e.name %>','<%= e.contact %>','<%= e.phone %>','<%= e.remark %>')">编辑</button>
+          <button class="btn-sm btn-danger" onclick="delEmp('<%= e._id %>')">删除</button>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+async function delEmp(id){if(confirm('确定删除？')){await fetch('/employers/'+id,{method:'DELETE'});location.reload();}}
+async function editEmp(id,name,contact,phone,remark){
+  const nn = prompt('名称:',name);
+  if(!nn)return;
+  await fetch('/employers/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:nn,contact,phone,remark})});
+  location.reload();
+}
+</script>
