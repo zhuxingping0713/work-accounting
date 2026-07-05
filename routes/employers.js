@@ -9,24 +9,28 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   const employers = await Employer.find({ userId: req.userId }).lean();
   for (let e of employers) {
-    // 累计收入：jobs 表中关联该雇主的收入
+    // 累计收入 = 账单收入(jobs) + 应发工资(salary)
     const jobs = await Job.find({ userId: req.userId, employerId: e._id, type: 'income' });
-    e.totalIncome = jobs.reduce((s,j)=>s+j.amount, 0);
+    const jobIncome = jobs.reduce((s,j)=>s+j.amount, 0);
+    const salaries = await Salary.find({ userId: req.userId, employerId: e._id });
+    const salaryTotal = salaries.reduce((s,r)=>s+r.amount, 0);
+    e.totalIncome = jobIncome + salaryTotal;
 
     // 预支：advance 表中关联该雇主的预支
     const advances = await Advance.find({ userId: req.userId, employerId: e._id });
     e.totalAdvance = advances.reduce((s,a)=>s+a.amount, 0);
 
-    // 应发工资：salary 表中关联该雇主的工资总额
-    const salaries = await Salary.find({ userId: req.userId, employerId: e._id });
-    e.totalSalary = salaries.reduce((s,r)=>s+r.amount, 0);
+    // 应发工资总额
+    e.totalSalary = salaryTotal;
 
     // 实发工资 = 应发工资 - 预支
     e.netSalary = e.totalSalary - e.totalAdvance;
 
-    // 最近打工
-    const last = jobs.sort((a,b)=>b.date.localeCompare(a.date))[0];
-    e.lastJob = last ? last.date : '-';
+    // 最近打工：取 jobs 和 salary 中最晚的日期
+    const jobDates = jobs.map(j => j.date);
+    const salaryDates = salaries.map(s => s.date);
+    const allDates = [...jobDates, ...salaryDates].sort((a,b)=>b.localeCompare(a));
+    e.lastJob = allDates[0] || '-';
   }
   res.render('employers', { employers, basePath, user: req.user });
 });
