@@ -19,7 +19,7 @@
   </div>
 
   <table>
-    <thead><tr><th>名称</th><th>联系人</th><th>电话</th><th>累计收入</th><th>最近打工</th><th>操作</th></tr></thead>
+    <thead><tr><th>名称</th><th>联系人</th><th>电话</th><th>累计收入</th><th>预支</th><th>实发工资</th><th>最近打工</th><th>操作</th></tr></thead>
     <tbody>
       <% employers.forEach(e => { %>
       <tr>
@@ -27,6 +27,8 @@
         <td><%= e.contact||'-' %></td>
         <td><%= e.phone||'-' %></td>
         <td class="positive">¥<%= (e.totalIncome||0).toFixed(2) %></td>
+        <td class="negative">¥<%= (e.totalAdvance||0).toFixed(2) %></td>
+        <td class="positive">¥<%= (e.netSalary||0).toFixed(2) %></td>
         <td><%= e.lastJob||'-' %></td>
         <td>
           <button class="btn-sm" onclick="editEmp('<%= e._id %>','<%= e.name %>','<%= e.contact %>','<%= e.phone %>','<%= e.remark %>')">编辑</button>

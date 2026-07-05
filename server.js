@@ -40,12 +40,14 @@ app.get('/settings', auth, (req, res) => {
 app.get('/', auth, async (req, res) => {
   const now = new Date();
   const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const year = `${now.getFullYear()}`;
 
   const Job = require('./models/Job');
   const Bill = require('./models/Bill');
   const Salary = require('./models/Salary');
   const Advance = require('./models/Advance');
 
+  // ---- 本月统计 ----
   const monthJobs = await Job.find({ userId: req.userId, date: { $regex: '^' + ym } });
   const monthIncome = monthJobs.filter(j=>j.type==='income').reduce((s,j)=>s+j.amount, 0);
   const monthExpense = monthJobs.filter(j=>j.type==='expense').reduce((s,j)=>s+j.amount, 0);
@@ -58,12 +60,47 @@ app.get('/', auth, async (req, res) => {
   const netSalary = salaryTotal - advanceTotal;
   const balance = monthIncome + netSalary - monthExpense - billTotal;
 
+  // ---- 全年统计 ----
+  const yearJobs = await Job.find({ userId: req.userId, date: { $regex: '^' + year } });
+  const yearIncome = yearJobs.filter(j=>j.type==='income').reduce((s,j)=>s+j.amount, 0);
+  const yearExpense = yearJobs.filter(j=>j.type==='expense').reduce((s,j)=>s+j.amount, 0);
+  const yearBills = await Bill.find({ userId: req.userId, month: { $regex: '^' + year } });
+  const yearBillTotal = yearBills.reduce((s,b)=>s+b.amount, 0);
+  const yearSalaries = await Salary.find({ userId: req.userId, date: { $regex: '^' + year } });
+  const yearAdvances = await Advance.find({ userId: req.userId, date: { $regex: '^' + year } });
+  const yearSalaryTotal = yearSalaries.reduce((s,r)=>s+r.amount, 0);
+  const yearAdvanceTotal = yearAdvances.reduce((s,r)=>s+r.amount, 0);
+  const yearNetSalary = yearSalaryTotal - yearAdvanceTotal;
+  const yearBalance = yearIncome + yearNetSalary - yearExpense - yearBillTotal;
+  const yearWorkDays = yearSalaries.length;
+
+  // ---- 月度趋势（近12个月） ----
+  const monthlyTrend = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const m = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const mJobs = await Job.find({ userId: req.userId, date: { $regex: '^' + m } });
+    const mSalaries = await Salary.find({ userId: req.userId, date: { $regex: '^' + m } });
+    const mAdvances = await Advance.find({ userId: req.userId, date: { $regex: '^' + m } });
+    monthlyTrend.push({
+      month: m.substring(5),
+      income: mJobs.filter(j=>j.type==='income').reduce((s,j)=>s+j.amount, 0),
+      expense: mJobs.filter(j=>j.type==='expense').reduce((s,j)=>s+j.amount, 0),
+      salary: mSalaries.reduce((s,r)=>s+r.amount, 0) - mAdvances.reduce((s,r)=>s+r.amount, 0)
+    });
+  }
+
   res.render('index', {
     basePath: process.env.BASE_PATH || '',
     user: req.user,
     currentMonth: ym,
     monthIncome, monthExpense, billTotal,
-    salaryTotal, advanceTotal, netSalary, balance
+    salaryTotal, advanceTotal, netSalary, balance,
+    // 全年
+    year, yearIncome, yearExpense, yearBillTotal,
+    yearSalaryTotal, yearAdvanceTotal, yearNetSalary, yearBalance, yearWorkDays,
+    // 月度趋势
+    monthlyTrend
   });
 });
 

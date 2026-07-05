@@ -28,6 +28,7 @@ main{max-width:1100px;margin:24px auto;padding:0 20px}
 .card.balance{background:linear-gradient(135deg,#a18cd1,#fbc2eb)}
 .card-label{font-size:13px;opacity:.9;margin-bottom:6px;font-weight:500}
 .card-val{font-size:26px;font-weight:800;letter-spacing:-1px}
+.year-cards .card{opacity:.88}
 .card small{font-size:12px;opacity:.75;display:block;font-weight:400;margin-top:2px;letter-spacing:0}
 
 /* ====== Charts ====== */

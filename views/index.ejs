@@ -9,6 +9,18 @@
     <div class="card balance"><div class="card-label">本月结余</div><div class="card-val">¥<%= balance.toFixed(2) %></div></div>
   </div>
 
+  <!-- ========== 全年统计 ========== -->
+  <h2 style="color:#fff;margin:28px 0 16px">📈 <%= year %> 年全年统计</h2>
+  <div class="cards year-cards">
+    <div class="card income"><div class="card-label">全年收入</div><div class="card-val">¥<%= yearIncome.toFixed(2) %></div></div>
+    <div class="card expense"><div class="card-label">全年支出</div><div class="card-val">¥<%= yearExpense.toFixed(2) %></div></div>
+    <div class="card salary"><div class="card-label">全年工资</div><div class="card-val">¥<%= yearNetSalary.toFixed(2) %><small> 出勤 <%= yearWorkDays %>天</small></div></div>
+    <div class="card utility"><div class="card-label">全年水电</div><div class="card-val">¥<%= yearBillTotal.toFixed(2) %></div></div>
+    <div class="card balance"><div class="card-label">全年结余</div><div class="card-val">¥<%= yearBalance.toFixed(2) %></div></div>
+  </div>
+
+  <div class="chart-box"><h3>📅 近12月趋势</h3><canvas id="monthlyTrendChart"></canvas></div>
+
   <div class="charts">
     <div class="chart-box"><h3>收入来源</h3><canvas id="incomeChart"></canvas></div>
     <div class="chart-box"><h3>支出分类</h3><canvas id="expenseChart"></canvas></div>
@@ -20,6 +32,30 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
 const basePath = '<%= basePath %>';
+
+// 月度趋势（后端数据）
+const monthlyTrend = <%- JSON.stringify(monthlyTrend) %>;
+
+new Chart(document.getElementById('monthlyTrendChart'), {
+  type: 'bar',
+  data: {
+    labels: monthlyTrend.map(t => t.month + '月'),
+    datasets: [
+      { label: '收入', data: monthlyTrend.map(t => t.income), backgroundColor: '#43e97b88', borderColor: '#43e97b', borderWidth: 1 },
+      { label: '支出', data: monthlyTrend.map(t => t.expense), backgroundColor: '#f5576c88', borderColor: '#f5576c', borderWidth: 1 },
+      { label: '工资(净)', data: monthlyTrend.map(t => t.salary), backgroundColor: '#4facfe88', borderColor: '#4facfe', borderWidth: 1 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom' } },
+    scales: {
+      x: { stacked: false },
+      y: { beginAtZero: true }
+    }
+  }
+});
+
 (async function(){
   const r = await fetch(basePath + '/api/stats/overview?month=<%= currentMonth %>');
   const data = await r.json();
