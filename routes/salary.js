@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
 
 router.post('/checkin', async (req, res) => {
   const { date, hours, dailyWage, advance, employerId, remark } = req.body;
-  const wage = +dailyWage || 240;
+  const wage = +dailyWage || 200;
   const h = +hours || 1;
   await Salary.findOneAndUpdate(
     { userId: req.userId, date },
@@ -48,7 +48,7 @@ router.post('/advance', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const { date, hours, dailyWage, advance, employerId, remark } = req.body;
-  const wage = +dailyWage || 240;
+  const wage = +dailyWage || 200;
   const h = +hours || 1;
   await Salary.findOneAndUpdate(
     { _id: req.params.id, userId: req.userId },

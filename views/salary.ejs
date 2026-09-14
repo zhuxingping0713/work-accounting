@@ -1,5 +1,5 @@
 <div class="page">
-  <h2>💰 工资管理 — <%= currentMonth %></h2>
+  <h2>💰 工资管理 �?<%= currentMonth %></h2>
 
   <div class="toolbar">
     <form class="filter-form" method="GET" action="<%= basePath %>/salary">
@@ -10,14 +10,14 @@
   </div>
 
   <div class="salary-summary">
-    <div class="s-item">📅 出勤 <strong><%= workDays %></strong> 天</div>
+    <div class="s-item">📅 出勤 <strong><%= workDays %></strong> �?/div>
     <div class="s-item">💰 应发 <strong>¥<%= totalSalary.toFixed(2) %></strong></div>
     <div class="s-item advance">💸 预支 <strong>¥<%= totalAdvance.toFixed(2) %></strong></div>
-    <div class="s-item net">✅ 实发 <strong>¥<%= netPay.toFixed(2) %></strong></div>
+    <div class="s-item net">�?实发 <strong>¥<%= netPay.toFixed(2) %></strong></div>
   </div>
 
   <div class="action-buttons">
-    <button class="btn-primary" onclick="document.getElementById('checkinForm').style.display='block'">➕ 打卡出勤</button>
+    <button class="btn-primary" onclick="document.getElementById('checkinForm').style.display='block'">�?打卡出勤</button>
     <button class="btn-warn" onclick="document.getElementById('advanceForm').style.display='block'">💸 预支</button>
   </div>
 
@@ -34,10 +34,10 @@
             <option value="<%= emp._id %>"><%= emp.name %></option>
           <% }) %>
         </select>
-        <label>工时(天):</label>
+        <label>工时(�?:</label>
         <input name="hours" type="number" value="1" step="0.5" min="0.5">
-        <label>日工资:</label>
-        <input name="dailyWage" type="number" value="240">
+        <label>日工�?</label>
+        <input name="dailyWage" type="number" value="200">
         <label>当天预支:</label>
         <input name="advance" type="number" value="0">
         <label>备注:</label>
@@ -89,10 +89,10 @@
             <option value="<%= emp._id %>"><%= emp.name %></option>
           <% }) %>
         </select>
-        <label>工时(天):</label>
+        <label>工时(�?:</label>
         <input name="hours" type="number" step="0.5" min="0.5">
-        <label>日工资:</label>
-        <input name="dailyWage" type="number" value="240">
+        <label>日工�?</label>
+        <input name="dailyWage" type="number" value="200">
         <label>当天预支:</label>
         <input name="advance" type="number" value="0">
         <label>备注:</label>
@@ -133,13 +133,13 @@
 
   <h3>📅 出勤记录</h3>
   <table>
-    <thead><tr><th>日期</th><th>雇主</th><th>工时</th><th>日工资</th><th>当天预支</th><th>小计</th><th>备注</th><th>操作</th></tr></thead>
+    <thead><tr><th>日期</th><th>雇主</th><th>工时</th><th>日工�?/th><th>当天预支</th><th>小计</th><th>备注</th><th>操作</th></tr></thead>
     <tbody>
       <% salaries.forEach(s => { %>
       <tr>
         <td><%= s.date %></td>
         <td><%= s.employerId?.name||'-' %></td>
-        <td><%= s.hours %>天</td>
+        <td><%= s.hours %>�?/td>
         <td>¥<%= s.dailyWage %></td>
         <td><%= s.advance>0?'¥'+s.advance:'-' %></td>
         <td class="positive">¥<%= s.amount.toFixed(2) %></td>
@@ -175,8 +175,8 @@
 
 <script>
 const basePath = '<%= basePath %>';
-async function delSalary(id){if(confirm('确定删除？')){await fetch(basePath+'/salary/'+id,{method:'DELETE'});location.reload();}}
-async function delAdvance(id){if(confirm('确定删除？')){await fetch(basePath+'/salary/advance/'+id,{method:'DELETE'});location.reload();}}
+async function delSalary(id){if(confirm('确定删除�?)){await fetch(basePath+'/salary/'+id,{method:'DELETE'});location.reload();}}
+async function delAdvance(id){if(confirm('确定删除�?)){await fetch(basePath+'/salary/advance/'+id,{method:'DELETE'});location.reload();}}
 
 function editSalary(id,date,hours,dailyWage,advance,employerId,remark){
   const f = document.getElementById('editSalaryForm');
@@ -195,7 +195,7 @@ document.getElementById('editSalaryForm').addEventListener('submit', async funct
   const body = {
     date: f.elements.date.value,
     hours: +f.elements.hours.value || 1,
-    dailyWage: +f.elements.dailyWage.value || 240,
+    dailyWage: +f.elements.dailyWage.value || 200,
     advance: +f.elements.advance.value || 0,
     employerId: f.elements.employerId.value || null,
     remark: f.elements.remark.value

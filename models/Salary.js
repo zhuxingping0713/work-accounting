@@ -5,8 +5,8 @@ const salarySchema = new mongoose.Schema({
   employerId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employer', default: null },
   date:       { type: String, required: true },
   hours:      { type: Number, default: 1 },
-  dailyWage:  { type: Number, default: 240 },
-  amount:     { type: Number, default: 240 },
+  dailyWage:  { type: Number, default: 200 },
+  amount:     { type: Number, default: 200 },
   advance:    { type: Number, default: 0 },
   remark:     { type: String, default: '' },
   createdAt:  { type: Date, default: Date.now }
