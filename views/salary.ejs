@@ -75,6 +75,62 @@
     </div>
   </div>
 
+  <div id="editForm" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>编辑出勤记录</h3>
+      <form id="editSalaryForm">
+        <input type="hidden" name="id">
+        <label>日期:</label>
+        <input name="date" type="date" required>
+        <label>雇主:</label>
+        <select name="employerId">
+          <option value="">-- 选择雇主 --</option>
+          <% employers.forEach(emp => { %>
+            <option value="<%= emp._id %>"><%= emp.name %></option>
+          <% }) %>
+        </select>
+        <label>工时(天):</label>
+        <input name="hours" type="number" step="0.5" min="0.5">
+        <label>日工资:</label>
+        <input name="dailyWage" type="number" value="240">
+        <label>当天预支:</label>
+        <input name="advance" type="number" value="0">
+        <label>备注:</label>
+        <input name="remark">
+        <div class="form-actions">
+          <button type="submit">保存</button>
+          <button type="button" onclick="document.getElementById('editForm').style.display='none'">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="editAdvanceForm" class="modal" style="display:none">
+    <div class="modal-content">
+      <h3>编辑预支记录</h3>
+      <form id="editAdvance">
+        <input type="hidden" name="id">
+        <label>日期:</label>
+        <input name="date" type="date" required>
+        <label>雇主:</label>
+        <select name="employerId">
+          <option value="">-- 选择雇主 --</option>
+          <% employers.forEach(emp => { %>
+            <option value="<%= emp._id %>"><%= emp.name %></option>
+          <% }) %>
+        </select>
+        <label>金额:</label>
+        <input name="amount" type="number" required>
+        <label>备注:</label>
+        <input name="remark">
+        <div class="form-actions">
+          <button type="submit">保存</button>
+          <button type="button" onclick="document.getElementById('editAdvanceForm').style.display='none'">取消</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <h3>📅 出勤记录</h3>
   <table>
     <thead><tr><th>日期</th><th>雇主</th><th>工时</th><th>日工资</th><th>当天预支</th><th>小计</th><th>备注</th><th>操作</th></tr></thead>
@@ -88,7 +144,10 @@
         <td><%= s.advance>0?'¥'+s.advance:'-' %></td>
         <td class="positive">¥<%= s.amount.toFixed(2) %></td>
         <td><%= s.remark %></td>
-        <td><button class="btn-sm btn-danger" onclick="delSalary('<%= s._id %>')">删除</button></td>
+        <td>
+          <button class="btn-sm" onclick="editSalary('<%= s._id %>','<%= s.date %>',<%= s.hours %>,<%= s.dailyWage %>,<%= s.advance %>,'<%= s.employerId?._id||'' %>','<%= (s.remark||'').replace(/'/g,"\\'") %>')">编辑</button>
+          <button class="btn-sm btn-danger" onclick="delSalary('<%= s._id %>')">删除</button>
+        </td>
       </tr>
       <% }) %>
     </tbody>
@@ -104,7 +163,10 @@
         <td><%= a.employerId?.name||'-' %></td>
         <td class="negative">¥<%= a.amount.toFixed(2) %></td>
         <td><%= a.remark %></td>
-        <td><button class="btn-sm btn-danger" onclick="delAdvance('<%= a._id %>')">删除</button></td>
+        <td>
+          <button class="btn-sm" onclick="editAdvance('<%= a._id %>','<%= a.date %>',<%= a.amount %>,'<%= a.employerId?._id||'' %>','<%= (a.remark||'').replace(/'/g,"\\'") %>')">编辑</button>
+          <button class="btn-sm btn-danger" onclick="delAdvance('<%= a._id %>')">删除</button>
+        </td>
       </tr>
       <% }) %>
     </tbody>
@@ -115,4 +177,52 @@
 const basePath = '<%= basePath %>';
 async function delSalary(id){if(confirm('确定删除？')){await fetch(basePath+'/salary/'+id,{method:'DELETE'});location.reload();}}
 async function delAdvance(id){if(confirm('确定删除？')){await fetch(basePath+'/salary/advance/'+id,{method:'DELETE'});location.reload();}}
+
+function editSalary(id,date,hours,dailyWage,advance,employerId,remark){
+  const f = document.getElementById('editSalaryForm');
+  f.elements.id.value = id;
+  f.elements.date.value = date;
+  f.elements.hours.value = hours;
+  f.elements.dailyWage.value = dailyWage;
+  f.elements.advance.value = advance;
+  f.elements.employerId.value = employerId;
+  f.elements.remark.value = remark;
+  document.getElementById('editForm').style.display = 'block';
+}
+document.getElementById('editSalaryForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const f = this;
+  const body = {
+    date: f.elements.date.value,
+    hours: +f.elements.hours.value || 1,
+    dailyWage: +f.elements.dailyWage.value || 240,
+    advance: +f.elements.advance.value || 0,
+    employerId: f.elements.employerId.value || null,
+    remark: f.elements.remark.value
+  };
+  await fetch(basePath+'/salary/'+f.elements.id.value,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  location.reload();
+});
+
+function editAdvance(id,date,amount,employerId,remark){
+  const f = document.getElementById('editAdvance');
+  f.elements.id.value = id;
+  f.elements.date.value = date;
+  f.elements.amount.value = amount;
+  f.elements.employerId.value = employerId;
+  f.elements.remark.value = remark;
+  document.getElementById('editAdvanceForm').style.display = 'block';
+}
+document.getElementById('editAdvance').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const f = this;
+  const body = {
+    date: f.elements.date.value,
+    amount: +f.elements.amount.value || 0,
+    employerId: f.elements.employerId.value || null,
+    remark: f.elements.remark.value
+  };
+  await fetch(basePath+'/salary/advance/'+f.elements.id.value,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  location.reload();
+});
 </script>

@@ -46,6 +46,27 @@ router.post('/advance', async (req, res) => {
   res.redirect(basePath + '/salary?month=' + date.substring(0,7));
 });
 
+router.put('/:id', async (req, res) => {
+  const { date, hours, dailyWage, advance, employerId, remark } = req.body;
+  const wage = +dailyWage || 240;
+  const h = +hours || 1;
+  await Salary.findOneAndUpdate(
+    { _id: req.params.id, userId: req.userId },
+    { date, hours: h, dailyWage: wage, amount: h * wage, advance: +advance || 0, employerId: employerId || null, remark },
+    { new: true }
+  );
+  res.json({ ok: true });
+});
+
+router.put('/advance/:id', async (req, res) => {
+  const { date, amount, employerId, remark } = req.body;
+  await Advance.findOneAndUpdate(
+    { _id: req.params.id, userId: req.userId },
+    { date, amount: +amount, employerId: employerId || null, remark }
+  );
+  res.json({ ok: true });
+});
+
 router.delete('/:id', async (req, res) => {
   await Salary.findOneAndDelete({ _id: req.params.id, userId: req.userId });
   res.json({ ok: true });
